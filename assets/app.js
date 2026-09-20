@@ -10,7 +10,7 @@ function toggleCheckin(n){
  const id=DATA.find(d=>d.n===n)['编号'];const next={...checkins};
  if(next[id])delete next[id];else next[id]=new Date().toISOString();
  try{localStorage.setItem(CHECKIN_KEY,JSON.stringify(next))}catch{toast('签到未保存，请允许浏览器存储后重试');return}
- checkins=next;render();showDetail(n);toast(isChecked(n)?'签到成功，该点位已标记为蓝色':'已取消签到');
+ checkins=next;render();showDetail(n);document.dispatchEvent(new Event('checkinschange'));toast(isChecked(n)?'签到成功，该点位已标记为蓝色':'已取消签到');
 }
 
 let region='全部',selected=null,map=null,markers=new Map(),toastTimer,labelLayer,expanded=false;

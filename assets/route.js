@@ -21,3 +21,22 @@ $('#routePlan').onclick=openVisitRoute;$('#closeVisitRoute').onclick=()=>$('#vis
 $('#routeStops').onclick=e=>{const button=e.target.closest('[data-route-stop]');if(button){$('#visitRoute').close();showDetail(Number(button.dataset.routeStop))}};
 $('#routeNext').onclick=()=>{const n=ROUTE.order.find(n=>!isChecked(n));if(n!==undefined){$('#visitRoute').close();showDetail(n)}};
 $('#routeOnMap').onclick=showVisitRouteMap;$('#routeMapNote').onclick=()=>{if(visitRouteLine)map.removeLayer(visitRouteLine);visitRouteLine=null;$('#routeMapNote').hidden=true};
+
+function renderJourney(){
+ const completed=ROUTE.order.filter(isChecked);
+ const latest=completed.slice().sort((a,b)=>Date.parse(checkins[DATA.find(d=>d.n===b)['编号']])-Date.parse(checkins[DATA.find(d=>d.n===a)['编号']]))[0];
+ const next=ROUTE.order.find(n=>!isChecked(n));
+ $('#journeyProgress').textContent=`${completed.length} / 20 已签到`;
+ $('#journeyCurrent').textContent=latest===undefined?'尚未签到 · 从 20 号开始':`最近签到：${latest} 号 · ${DATA.find(d=>d.n===latest)['楼盘名称']}`;
+ $('#journeyNext').disabled=next===undefined;
+ $('#journeyNextLabel').textContent=next===undefined?'全部完成':completed.length?'下一站':'从这里开始';
+ $('#journeyNextName').textContent=next===undefined?'20 个点位均已签到':`${next} 号 · ${DATA.find(d=>d.n===next)['楼盘名称']}`;
+ $('#journeyNext span').textContent=next===undefined?'可点击「今日路线」查看记录':'查看点位 / 打开地图 ↗';
+ $('#journeyHint').textContent=next===undefined?'本次行程已完成':completed.length?'按路线顺序推荐下一未签到点 · 进度自动保存':'步行 + 共享单车 · 进度自动保存';
+ layout();
+}
+$('#journeyNext').onclick=()=>{const n=ROUTE.order.find(n=>!isChecked(n));if(n!==undefined){region='全部';$('#search').value='';render();showDetail(n)}};
+$('#pointSearch').ontoggle=()=>{layout();if(selected===null)fit()};
+document.addEventListener('checkinschange',renderJourney);
+window.addEventListener('pageshow',()=>{try{const saved=JSON.parse(localStorage.getItem(CHECKIN_KEY)||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))checkins=saved}catch{}render();renderJourney()});
+renderJourney();fit();
