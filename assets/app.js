@@ -69,3 +69,30 @@ function spreadPins(){
   }
  }
 }
+
+// On-demand location only; coordinates are never stored or sent by this page.
+let userMarker=null,userAccuracy=null,locating=false;
+const coverageBoxes=[[31.25,121.485,31.275,121.525],[31.25,121.465,31.28,121.485],[31.25,121.525,31.285,121.545],[31.275,121.485,31.292,121.525]];
+function locateMe(){
+ if(locating)return;
+ const status=$('#locationStatus');status.hidden=false;
+ if(!window.isSecureContext){status.textContent='请使用 HTTPS 线上页面开启定位';return}
+ if(!navigator.geolocation){status.textContent='当前浏览器不支持定位，请使用手机浏览器打开';return}
+ locating=true;$('#locate').setAttribute('aria-busy','true');status.textContent='正在定位，请允许浏览器访问位置…';
+ const done=()=>{locating=false;$('#locate').setAttribute('aria-busy','false')};
+ navigator.geolocation.getCurrentPosition(position=>{
+  done();const {latitude,longitude,accuracy}=position.coords;
+  if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||!Number.isFinite(accuracy)){status.textContent='未能获取有效位置，请重试';return}
+  const coord=[latitude,longitude];
+  if(userMarker)map.removeLayer(userMarker);if(userAccuracy)map.removeLayer(userAccuracy);
+  userAccuracy=L.circle(coord,{radius:accuracy,color:'#7850bc',weight:1,fillColor:'#7850bc',fillOpacity:.12,interactive:false}).addTo(map);
+  userMarker=L.marker(coord,{zIndexOffset:2000,icon:L.divIcon({className:'user-location',iconSize:[20,20],iconAnchor:[10,10]}),title:'我的位置'}).addTo(map).bindTooltip('我的位置',{permanent:true,direction:'top',className:'user-location-label',offset:[0,-12]});
+  const covered=coverageBoxes.some(([s,w,n,e])=>latitude>=s&&latitude<=n&&longitude>=w&&longitude<=e);
+  selected=null;expanded=false;listView();map.setMaxBounds(null);map.setView(coord,16,{animate:false});
+  status.textContent=`我的位置 · 精度约 ${Math.round(accuracy)} 米 · ${new Date(position.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}${covered?'':' · 已超出街区底图范围'}。再次点定位可刷新`;
+ },error=>{
+  done();if(userMarker){map.removeLayer(userMarker);userMarker=null}if(userAccuracy){map.removeLayer(userAccuracy);userAccuracy=null}
+  status.textContent=error.code===1?'定位权限未开启，请在浏览器的网站设置中允许位置访问':error.code===3?'定位超时，请检查手机定位服务后重试':'暂时无法获取位置，请检查定位服务和网络后重试';
+ },{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+$('#locate').onclick=locateMe;
