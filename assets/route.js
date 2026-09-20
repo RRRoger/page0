@@ -56,7 +56,17 @@ function setMapPreview(visible){
  layout();if(visible)focusJourney();
 }
 $('#previewMap').onclick=()=>setMapPreview(!document.body.classList.contains('map-preview-visible'));
-$('#locateFromHome').onclick=()=>{setMapPreview(true);locateMe()};
+$('#locateFromHome').onclick=()=>{
+ selected=null;expanded=false;listView();
+ document.body.classList.add('location-mode');$('#returnJourney').hidden=false;
+ setMapPreview(true);map.invalidateSize({pan:false});locateMe();
+};
+function returnToJourney(){
+ document.body.classList.remove('location-mode');$('#returnJourney').hidden=true;
+ selected=null;expanded=false;listView();setMapPreview(false);renderJourney();window.scrollTo(0,0);
+}
+$('#returnJourney').onclick=returnToJourney;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.body.classList.contains('location-mode'))returnToJourney()});
 
 let joyTimer;
 document.addEventListener('checkinschange',event=>{
