@@ -33,6 +33,7 @@ function journeyState(){
 function renderJourney(){
  const {completed,latest,next}=journeyState();
  const destination=DATA.find(d=>d.n===next),last=DATA.find(d=>d.n===latest);
+ $('#stampCircles').innerHTML=ROUTE.order.map(n=>`<span role="listitem" class="stamp-circle ${isChecked(n)?'stamped':n===next?'stamp-next':''}" aria-label="${n}号，${isChecked(n)?'已打卡':n===next?'下一站':'未打卡'}" title="${n}号 · ${escapeHTML(DATA.find(d=>d.n===n)['楼盘名称'])}">${isChecked(n)?'✓':n}</span>`).join('');
  $('#journeyProgress').textContent=`${completed.length} / 20 已打卡`;
  $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:'尚未开始 · 先前往第 20 号点位';
  $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
