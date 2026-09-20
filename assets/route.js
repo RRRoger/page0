@@ -93,3 +93,21 @@ $('#confirmRestart').onclick=()=>{
  if(visitRouteLine){map.removeLayer(visitRouteLine);visitRouteLine=null}$('#routeMapNote').hidden=true;
  region='全部';$('#search').value='';$('#restartDialog').close();returnToJourney();renderVisitRoute();focusJourney();toast('已重新开始，从 20 号出发');
 };
+function celebrateAllStops(){
+ document.querySelector('.completion-confetti')?.remove();
+ const layer=document.createElement('div');layer.className='completion-confetti';layer.setAttribute('aria-hidden','true');
+ const colors=['#b57c99','#e6b7c9','#cfb77d','#b1c8ba','#c1b1d4','#f0d8ab'];
+ for(let i=0;i<64;i++){
+  const petal=document.createElement('i');
+  petal.style.cssText=`--x:${Math.random()*100}vw;--drift:${(Math.random()-.5)*220}px;--delay:${Math.random()*.7}s;--duration:${2.6+Math.random()*1.4}s;--spin:${Math.random()*900-450}deg;background:${colors[i%colors.length]};border-radius:${i%3===0?'50%':'2px'};width:${6+Math.random()*5}px;height:${8+Math.random()*8}px`;
+  layer.appendChild(petal);
+ }
+ document.body.appendChild(layer);
+ setTimeout(()=>layer.remove(),5000);
+}
+document.addEventListener('checkinschange',event=>{
+ if(event.detail?.checked&&journeyState().completed.length===20){
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)celebrateAllStops();
+  clearTimeout(joyTimer);joyTimer=setTimeout(()=>{$('#checkinJoy').hidden=true},4800);
+ }
+});
