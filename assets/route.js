@@ -1,4 +1,5 @@
 let visitRouteLine=null;
+function formatDistance(meters){return meters<1000?`${Math.round(meters)} 米`:`${(meters/1000).toFixed(1)} 千米`}
 function legAdvice(meters){return meters===0?'同楼盘步行 · 核对不同门位':meters<=600?'建议步行':'建议共享单车'}
 function renderVisitRoute(){
  const checked=ROUTE.order.filter(isChecked).length;
@@ -7,7 +8,7 @@ function renderVisitRoute(){
  $('#routeProgress').value=checked;
  $('#routeStops').innerHTML=ROUTE.order.map((n,i)=>{
   const d=DATA.find(d=>d.n===n),leg=ROUTE.legs[i-1];
-  const segment=leg?(leg.meters===0?legAdvice(0):`上站 → 此站 · 直线 ${(leg.meters/1000).toFixed(2)} km · ${legAdvice(leg.meters)}`):'起点 · 请先到达这里';
+  const segment=leg?(leg.meters===0?legAdvice(0):`直线约 ${formatDistance(leg.meters)} · ${legAdvice(leg.meters)}`):'起点 · 请先到达这里';
   return `<li class="${isChecked(n)?'stop-done':n===upcoming?'stop-next':'stop-pending'}" ${n===upcoming?'aria-current="step"':''}><p class="route-leg">${segment}</p><div class="route-stop"><span class="route-sequence">${isChecked(n)?'✓':i+1}</span><div>${n===upcoming?'<span class="next-badge">下一站</span>':''}<strong>${n} 号 · ${escapeHTML(d['楼盘名称'])}</strong><p>${escapeHTML(d['地址'])}</p><small>${isChecked(n)?'已打卡':'待前往'} · ${escapeHTML(d['门的方位'])}</small></div><button class="text-button" data-route-stop="${n}">查看</button></div></li>`;
  }).join('');
  const next=ROUTE.order.find(n=>!isChecked(n));$('#routeNext').disabled=next===undefined;$('#routeNext').textContent=next===undefined?'20 个点位已全部签到':`查看下一未签到点 · ${next} 号`;
@@ -39,7 +40,7 @@ function renderJourney(){
  $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
  $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'20 站全部打卡完成';
  $('#nextAddress').textContent=destination?`${destination['地址']} · ${destination['门的方位']}`:'辛苦了！打卡记录已保存在当前浏览器。';
- $('#journeyHint').textContent=destination?(last?legAdvice(Math.round(map.distance(last.coord,destination.coord)))+' · 从最近打卡点出发':'先到起点 · 在地图 App 选择步行、骑行或公交'):'';
+ $('#journeyHint').textContent=destination?(last?'直线约 '+formatDistance(map.distance(last.coord,destination.coord))+' · '+legAdvice(Math.round(map.distance(last.coord,destination.coord))):'先前往起点 · 地图内选择交通方式'):'';
  $('#homeNavigate').hidden=!destination;$('#homeCheckin').hidden=!destination;$('#undoLast').hidden=!last;
  layout();
 }
