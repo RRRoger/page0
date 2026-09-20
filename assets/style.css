@@ -701,3 +701,5 @@ body.map-fullscreen{overflow:hidden}
 }
 .point-cluster{display:grid;place-items:center;border-radius:50%;background:#d4e5d3;border:4px solid #fff;box-shadow:0 3px 10px #20392d20;color:#175c49;font-size:18px;font-weight:750}.point-cluster small{font-size:10px;margin-left:2px}.point-cluster:focus-visible{outline:3px solid #ac5225}
 #appVersion{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:5px;background:#e4ece2;color:#17634e;font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.pin.checked{background:#2469d0}.pin.checked.selected{box-shadow:0 0 0 3px #a9caff,0 3px 8px #20392d35}.number.checked{background:#e3edff;color:#205bb8}.checkin-panel{padding:14px 0;border-bottom:1px solid var(--line)}.checkin-button{width:100%;min-height:46px;background:var(--green);color:white;border-radius:10px;font-weight:600}.checkin-button.is-checked{background:#2469d0}.checkin-panel p{font-size:11px;color:var(--muted);margin:8px 0 0}
