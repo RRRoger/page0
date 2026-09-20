@@ -12,7 +12,7 @@ function renderVisitRoute(){
 }
 function openVisitRoute(){renderVisitRoute();$('#visitRoute').showModal()}
 function showVisitRouteMap(){
- $('#visitRoute').close();selected=null;expanded=false;region='全部';$('#search').value='';listView();
+ $('#visitRoute').close();setMapPreview(true);selected=null;expanded=false;region='全部';$('#search').value='';listView();
  if(visitRouteLine)map.removeLayer(visitRouteLine);
  visitRouteLine=L.polyline(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord),{color:'#ac5225',weight:3,dashArray:'7 8',opacity:.9,interactive:false}).addTo(map);
  $('#routeMapNote').hidden=false;fit();
@@ -22,21 +22,38 @@ $('#routeStops').onclick=e=>{const button=e.target.closest('[data-route-stop]');
 $('#routeNext').onclick=()=>{const n=ROUTE.order.find(n=>!isChecked(n));if(n!==undefined){$('#visitRoute').close();showDetail(n)}};
 $('#routeOnMap').onclick=showVisitRouteMap;$('#routeMapNote').onclick=()=>{if(visitRouteLine)map.removeLayer(visitRouteLine);visitRouteLine=null;$('#routeMapNote').hidden=true};
 
-function renderJourney(){
+
+function journeyState(){
  const completed=ROUTE.order.filter(isChecked);
  const latest=completed.slice().sort((a,b)=>Date.parse(checkins[DATA.find(d=>d.n===b)['编号']])-Date.parse(checkins[DATA.find(d=>d.n===a)['编号']]))[0];
- const next=ROUTE.order.find(n=>!isChecked(n));
- $('#journeyProgress').textContent=`${completed.length} / 20 已签到`;
- $('#journeyCurrent').textContent=latest===undefined?'尚未签到 · 从 20 号开始':`最近签到：${latest} 号 · ${DATA.find(d=>d.n===latest)['楼盘名称']}`;
- $('#journeyNext').disabled=next===undefined;
- $('#journeyNextLabel').textContent=next===undefined?'全部完成':completed.length?'下一站':'从这里开始';
- $('#journeyNextName').textContent=next===undefined?'20 个点位均已签到':`${next} 号 · ${DATA.find(d=>d.n===next)['楼盘名称']}`;
- $('#journeyNext span').textContent=next===undefined?'可点击「今日路线」查看记录':'查看点位 / 打开地图 ↗';
- $('#journeyHint').textContent=next===undefined?'本次行程已完成':completed.length?'按路线顺序推荐下一未签到点 · 进度自动保存':'步行 + 共享单车 · 进度自动保存';
+ return {completed,latest,next:ROUTE.order.find(n=>!isChecked(n))};
+}
+function renderJourney(){
+ const {completed,latest,next}=journeyState();
+ const destination=DATA.find(d=>d.n===next),last=DATA.find(d=>d.n===latest);
+ $('#journeyProgress').textContent=`${completed.length} / 20 已打卡`;
+ $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:'尚未开始 · 先前往第 20 号点位';
+ $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
+ $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'20 站全部打卡完成';
+ $('#nextAddress').textContent=destination?`${destination['地址']} · ${destination['门的方位']}`:'辛苦了！打卡记录已保存在当前浏览器。';
+ $('#journeyHint').textContent=destination?(last?legAdvice(Math.round(map.distance(last.coord,destination.coord)))+' · 从最近打卡点出发':'先到起点 · 在地图 App 选择步行、骑行或公交'):'';
+ $('#homeNavigate').hidden=!destination;$('#homeCheckin').hidden=!destination;$('#undoLast').hidden=!last;
  layout();
 }
-$('#journeyNext').onclick=()=>{const n=ROUTE.order.find(n=>!isChecked(n));if(n!==undefined){region='全部';$('#search').value='';render();showDetail(n)}};
+$('#homeNavigate').onclick=()=>{const {next}=journeyState();if(next!==undefined)openNavigation(DATA.find(d=>d.n===next))};
+$('#homeCheckin').onclick=()=>{const {next}=journeyState();if(next!==undefined){toggleCheckin(next);listView();renderJourney();focusJourney()}};
+$('#undoLast').onclick=()=>{const {latest}=journeyState();if(latest!==undefined){toggleCheckin(latest);listView();renderJourney();focusJourney()}};
+function focusJourney(){const {latest,next}=journeyState();if(next===undefined){fit();return}const points=[DATA.find(d=>d.n===next).coord];if(latest!==undefined)points.push(DATA.find(d=>d.n===latest).coord);map.fitBounds(points,{padding:[55,55],maxZoom:16,animate:false})}
 $('#pointSearch').ontoggle=()=>{layout();if(selected===null)fit()};
 document.addEventListener('checkinschange',renderJourney);
 window.addEventListener('pageshow',()=>{try{const saved=JSON.parse(localStorage.getItem(CHECKIN_KEY)||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))checkins=saved}catch{}render();renderJourney()});
-renderJourney();fit();
+renderJourney();focusJourney();
+
+function setMapPreview(visible){
+ document.body.classList.toggle('map-preview-visible',visible);
+ $('#previewMap').textContent=visible?'收起地图':'地图预览';
+ if(visible&&onlineTiles&&!map.hasLayer(onlineTiles))onlineTiles.addTo(map);
+ layout();if(visible)focusJourney();
+}
+$('#previewMap').onclick=()=>setMapPreview(!document.body.classList.contains('map-preview-visible'));
+$('#locateFromHome').onclick=()=>{setMapPreview(true);locateMe()};

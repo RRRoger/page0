@@ -122,7 +122,7 @@ function initOnlineBasemap(){
  onlineTiles.on('loading',()=>{failures=0;$('#basemapNotice').hidden=true});
  onlineTiles.on('tileerror',()=>{failures++;$('#basemapNotice').hidden=false});
  onlineTiles.on('load',()=>{$('#basemapNotice').hidden=failures===0});
- onlineTiles.addTo(map);
+ // Load online tiles only when the user opens the map preview.
 }
 $('#shanghai').onclick=()=>{selected=null;expanded=false;listView();map.fitBounds([[30.65,120.85],[31.9,122.05]],{padding:[20,30],animate:!reduced})};
 $('#basemapNotice').onclick=()=>{onlineTiles.redraw()};
