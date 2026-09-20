@@ -38,7 +38,7 @@ function renderJourney(){
  $('#journeyProgress').textContent=`${completed.length} / 20 已打卡`;
  $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:'尚未开始 · 先前往第 20 号点位';
  $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
- $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'算你牛逼';
+ $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'全部打卡完成，算你牛逼，辛苦你了';
  $('#nextAddress').textContent=destination?`${destination['地址']} · ${destination['门的方位']}`:'辛苦了！打卡记录已保存在当前浏览器。';
  $('#journeyHint').textContent=destination?(last?'直线约 '+formatDistance(map.distance(last.coord,destination.coord))+' · '+legAdvice(Math.round(map.distance(last.coord,destination.coord))):'先前往起点 · 地图内选择交通方式'):'';
  $('#homeNavigate').hidden=!destination;$('#homeCheckin').hidden=!destination;$('#undoLast').hidden=!last;
@@ -80,7 +80,7 @@ document.addEventListener('checkinschange',event=>{
  clearTimeout(joyTimer);$('#checkinJoy').hidden=true;
  if(!event.detail?.checked)return;
  const d=DATA.find(d=>d.n===event.detail.n),count=journeyState().completed.length;
- $('#joyTitle').textContent=count===20?'算你牛逼':'这一站完成啦！';
+ $('#joyTitle').textContent=count===20?'全部打卡完成，算你牛逼，辛苦你了':'这一站完成啦！';
  $('#joyText').textContent=`${d.n} 号 · ${d['楼盘名称']} · ${count}/20`;
  $('#checkinJoy').hidden=false;$('#toast').style.display='none';
  // toggleCheckin's existing toast runs after the event handler.
