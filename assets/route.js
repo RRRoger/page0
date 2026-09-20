@@ -57,3 +57,16 @@ function setMapPreview(visible){
 }
 $('#previewMap').onclick=()=>setMapPreview(!document.body.classList.contains('map-preview-visible'));
 $('#locateFromHome').onclick=()=>{setMapPreview(true);locateMe()};
+
+let joyTimer;
+document.addEventListener('checkinschange',event=>{
+ clearTimeout(joyTimer);$('#checkinJoy').hidden=true;
+ if(!event.detail?.checked)return;
+ const d=DATA.find(d=>d.n===event.detail.n),count=journeyState().completed.length;
+ $('#joyTitle').textContent=count===20?'20 站，全部完成啦！':'这一站完成啦！';
+ $('#joyText').textContent=`${d.n} 号 · ${d['楼盘名称']} · ${count}/20`;
+ $('#checkinJoy').hidden=false;$('#toast').style.display='none';
+ // toggleCheckin's existing toast runs after the event handler.
+ queueMicrotask(()=>{$('#toast').style.display='none'});
+ joyTimer=setTimeout(()=>{$('#checkinJoy').hidden=true},2600);
+});

@@ -10,7 +10,7 @@ function toggleCheckin(n){
  const id=DATA.find(d=>d.n===n)['编号'];const next={...checkins};
  if(next[id])delete next[id];else next[id]=new Date().toISOString();
  try{localStorage.setItem(CHECKIN_KEY,JSON.stringify(next))}catch{toast('签到未保存，请允许浏览器存储后重试');return}
- checkins=next;render();showDetail(n);document.dispatchEvent(new Event('checkinschange'));toast(isChecked(n)?'签到成功，该点位已标记为蓝色':'已取消签到');
+ checkins=next;render();showDetail(n);document.dispatchEvent(new CustomEvent('checkinschange',{detail:{n,checked:isChecked(n)}}));toast(isChecked(n)?'签到成功，该点位已标记为蓝色':'已取消签到');
 }
 
 let region='全部',selected=null,map=null,markers=new Map(),toastTimer,labelLayer,expanded=false;
@@ -86,7 +86,7 @@ function locateMe(){
   const coord=[latitude,longitude];
   if(userMarker)map.removeLayer(userMarker);if(userAccuracy)map.removeLayer(userAccuracy);
   userAccuracy=L.circle(coord,{radius:accuracy,color:'#7850bc',weight:1,fillColor:'#7850bc',fillOpacity:.12,interactive:false}).addTo(map);
-  userMarker=L.marker(coord,{zIndexOffset:2000,icon:L.divIcon({className:'user-location',iconSize:[20,20],iconAnchor:[10,10]}),title:'我的位置'}).addTo(map).bindTooltip('我的位置',{permanent:true,direction:'top',className:'user-location-label',offset:[0,-12]});
+  userMarker=L.marker(coord,{zIndexOffset:2000,icon:L.divIcon({className:'user-location avatar-location',html:'<img src="./assets/avatar.jpg" alt="我的位置">',iconSize:[44,44],iconAnchor:[22,22]}),title:'我的位置'}).addTo(map).bindTooltip('我的位置',{permanent:true,direction:'top',className:'user-location-label',offset:[0,-12]});
   const covered=coverageBoxes.some(([s,w,n,e])=>latitude>=s&&latitude<=n&&longitude>=w&&longitude<=e);
   selected=null;expanded=false;listView();map.setMaxBounds(null);map.setView(coord,16,{animate:false});
   status.textContent=`我的位置 · 精度约 ${Math.round(accuracy)} 米 · ${new Date(position.timestamp).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}。再次点定位可刷新`;
