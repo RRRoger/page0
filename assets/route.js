@@ -80,3 +80,12 @@ document.addEventListener('checkinschange',event=>{
  queueMicrotask(()=>{$('#toast').style.display='none'});
  joyTimer=setTimeout(()=>{$('#checkinJoy').hidden=true},2600);
 });
+
+$('#restartJourney').onclick=()=>$('#restartDialog').showModal();
+$('#cancelRestart').onclick=()=>$('#restartDialog').close();
+$('#confirmRestart').onclick=()=>{
+ try{localStorage.removeItem(CHECKIN_KEY)}catch{toast('未能清空记录，请检查浏览器存储权限后重试');return}
+ checkins={};clearTimeout(joyTimer);$('#checkinJoy').hidden=true;
+ if(visitRouteLine){map.removeLayer(visitRouteLine);visitRouteLine=null}$('#routeMapNote').hidden=true;
+ region='全部';$('#search').value='';$('#restartDialog').close();returnToJourney();renderVisitRoute();focusJourney();toast('已重新开始，从 20 号出发');
+};
