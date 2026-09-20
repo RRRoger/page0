@@ -1,11 +1,62 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
-  </head>
-  <body>
-    <h1>Hello World</h1>
-  </body>
-</html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f7f7f2"><title>宁波银行 · 上刊点位地图</title><link rel="stylesheet" href="./assets/style.css"><!-- Third-party notices
+Leaflet 1.9.4
+
+BSD 2-Clause License
+
+Copyright (c) 2010-2023, Volodymyr Agafonkin
+Copyright (c) 2010-2011, CloudMade
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Leaflet.markercluster 1.5.3
+
+Copyright 2012 David Leaver
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+--></head><body><header><div class="brand"><div class="brand-name"><span>宁波银行</span>上刊点位</div><button id="settings" aria-label="查看地图说明"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 17h16M8 4v6M16 14v6"/></svg></button></div><p>上海 · 20 处道闸点位 · 点选查看上刊信息</p><div class="search"><svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg><input id="search" type="search" aria-label="搜索楼盘、地址或点位编号" placeholder="搜索楼盘、地址、编号"><button id="clearSearch" aria-label="清空搜索" hidden>清空</button></div><nav class="filters" aria-label="按区域筛选"></nav></header>
+<main class="workspace"><div id="map" aria-label="上海上刊点位地图，支持拖动、缩放和点选"></div><div class="fallback" id="fallback"><div class="fallback-content"><div class="map-icon"><svg viewBox="0 0 24 24"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15m6-12v15"/></svg></div><h1 id="fallbackTitle">正在打开点位地图</h1><p id="fallbackText">本地街区地图与点位资料正在加载。</p><button class="primary" id="connect">刷新页面</button></div></div><div id="status" class="map-status" role="status" aria-live="polite"></div><button id="exitFullscreen" class="exit-fullscreen" hidden>退出全屏</button><div class="map-tools" id="mapTools"><button id="fullscreen" aria-label="全屏显示地图" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button><button id="fit" aria-label="查看全部筛选点位"><svg viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><circle cx="12" cy="12" r="3"/></svg></button><button id="zoomIn" aria-label="放大地图">＋</button><button id="zoomOut" aria-label="缩小地图">−</button></div>
+<section class="sheet" id="sheet" aria-label="点位信息"><button class="handle" id="handle" aria-label="展开点位面板" aria-expanded="false"></button><div class="sheet-top"><h2 id="sheetTitle">点位列表 <span>20</span></h2><div class="sheet-actions"><button class="text-button" id="detailExpand" hidden>展开详情</button><button class="text-button" id="sheetAction">展开列表</button></div></div><div class="sheet-scroll" id="scroll"><div id="list"></div><article id="detail" class="detail"></article></div></section></main>
+<dialog class="config" id="about"><h2>上海上刊点位地图</h2><p>20 条上刊记录，来自原始 Excel。点击编号查看门位、道闸形式和楼盘资料；相邻点位自动聚合，点击带「处」的圆形标记展开；同址点位会展开为独立编号。</p><h3>楼盘参考位置</h3><p>地图使用公开楼盘坐标或楼盘范围中心，不代表道闸的实测位置。具体出入口请以详情中的「门的方位」和现场为准。每条详情均可查看位置来源。</p><h3>全屏查看</h3><p>点击地图右上角全屏按钮，地图即可占满屏幕。点选编号显示详情，收起详情后恢复整屏地图。手机浏览器不支持系统全屏时，自动使用页面全屏。</p><h3>打开就能用</h3><p>采用 Leaflet 与 OpenStreetMap 街区数据，地图、脚本和资料均内嵌于本页，无需 API Key。底图仅覆盖本项目周边街区，非全国地图。</p><p>地图数据：© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>（ODbL），街区快照整理于 2026-09-20。距离、价格等信息沿用原表，不代表实时数据。</p><button class="primary" id="closeAbout">知道了</button></dialog><div class="toast" id="toast" role="status"></div><script src="./assets/vendor.js"></script>
+<script src="./assets/locations.js"></script>
+<script src="./assets/map-data.js"></script>
+<script src="./assets/app.js"></script></body></html>
