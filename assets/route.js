@@ -15,7 +15,7 @@ function renderVisitRoute(){
 }
 function openVisitRoute(){renderVisitRoute();$('#visitRoute').showModal()}
 function showVisitRouteMap(){
- $('#visitRoute').close();setMapPreview(true);selected=null;expanded=false;region='全部';$('#search').value='';listView();
+ $('#visitRoute').close();openFullMap();selected=null;expanded=false;region='全部';$('#search').value='';listView();
  if(visitRouteLine)map.removeLayer(visitRouteLine);
  visitRouteLine=L.polyline(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord),{color:'#ac5225',weight:3,dashArray:'7 8',opacity:.9,interactive:false}).addTo(map);
  $('#routeMapNote').hidden=false;fit();
@@ -59,12 +59,15 @@ function setMapPreview(visible){
  if(visible&&onlineTiles&&!map.hasLayer(onlineTiles))onlineTiles.addTo(map);
  layout();if(visible)focusJourney();
 }
-$('#previewMap').onclick=()=>setMapPreview(!document.body.classList.contains('map-preview-visible'));
-$('#locateFromHome').onclick=()=>{
+function openFullMap(locate=false){
  selected=null;expanded=false;listView();
  document.body.classList.add('location-mode');$('#returnJourney').hidden=false;
- setMapPreview(true);map.invalidateSize({pan:false});locateMe();
-};
+ setMapPreview(true);map.invalidateSize({pan:false});
+ $('#locationStatus').hidden=!locate;
+ if(locate)locateMe();else fit();
+}
+$('#previewMap').onclick=()=>openFullMap();
+$('#locateFromHome').onclick=()=>openFullMap(true);
 function returnToJourney(){
  document.body.classList.remove('location-mode');$('#returnJourney').hidden=true;
  selected=null;expanded=false;listView();setMapPreview(false);renderJourney();window.scrollTo(0,0);
