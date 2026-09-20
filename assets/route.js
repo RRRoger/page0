@@ -99,7 +99,7 @@ $('#confirmRestart').onclick=()=>{
 function celebrateAllStops(){
  document.querySelector('.completion-confetti')?.remove();
  const layer=document.createElement('div');layer.className='completion-confetti';layer.setAttribute('aria-hidden','true');
- const colors=['#b57c99','#e6b7c9','#cfb77d','#b1c8ba','#c1b1d4','#f0d8ab'];
+ const colors=['#387cf0','#8ebaff','#e0b866','#94a3b8','#4db5a8','#dce7f6'];
  for(let i=0;i<64;i++){
   const petal=document.createElement('i');
   petal.style.cssText=`--x:${Math.random()*100}vw;--drift:${(Math.random()-.5)*220}px;--delay:${Math.random()*.7}s;--duration:${2.6+Math.random()*1.4}s;--spin:${Math.random()*900-450}deg;background:${colors[i%colors.length]};border-radius:${i%3===0?'50%':'2px'};width:${6+Math.random()*5}px;height:${8+Math.random()*8}px`;
