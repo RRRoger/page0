@@ -38,7 +38,7 @@ function renderJourney(){
  $('#journeyProgress').textContent=`${completed.length} / 20 已打卡`;
  $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:'尚未开始 · 先前往第 20 号点位';
  $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
- $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'20 站全部打卡完成';
+ $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'算你牛逼';
  $('#nextAddress').textContent=destination?`${destination['地址']} · ${destination['门的方位']}`:'辛苦了！打卡记录已保存在当前浏览器。';
  $('#journeyHint').textContent=destination?(last?'直线约 '+formatDistance(map.distance(last.coord,destination.coord))+' · '+legAdvice(Math.round(map.distance(last.coord,destination.coord))):'先前往起点 · 地图内选择交通方式'):'';
  $('#homeNavigate').hidden=!destination;$('#homeCheckin').hidden=!destination;$('#undoLast').hidden=!last;
@@ -80,7 +80,7 @@ document.addEventListener('checkinschange',event=>{
  clearTimeout(joyTimer);$('#checkinJoy').hidden=true;
  if(!event.detail?.checked)return;
  const d=DATA.find(d=>d.n===event.detail.n),count=journeyState().completed.length;
- $('#joyTitle').textContent=count===20?'20 站，全部完成啦！':'这一站完成啦！';
+ $('#joyTitle').textContent=count===20?'算你牛逼':'这一站完成啦！';
  $('#joyText').textContent=`${d.n} 号 · ${d['楼盘名称']} · ${count}/20`;
  $('#checkinJoy').hidden=false;$('#toast').style.display='none';
  // toggleCheckin's existing toast runs after the event handler.
@@ -96,21 +96,8 @@ $('#confirmRestart').onclick=()=>{
  if(visitRouteLine){map.removeLayer(visitRouteLine);visitRouteLine=null}$('#routeMapNote').hidden=true;
  region='全部';$('#search').value='';$('#restartDialog').close();returnToJourney();renderVisitRoute();focusJourney();toast('已重新开始，从 20 号出发');
 };
-function celebrateAllStops(){
- document.querySelector('.completion-confetti')?.remove();
- const layer=document.createElement('div');layer.className='completion-confetti';layer.setAttribute('aria-hidden','true');
- const colors=['#387cf0','#8ebaff','#e0b866','#94a3b8','#4db5a8','#dce7f6'];
- for(let i=0;i<64;i++){
-  const petal=document.createElement('i');
-  petal.style.cssText=`--x:${Math.random()*100}vw;--drift:${(Math.random()-.5)*220}px;--delay:${Math.random()*.7}s;--duration:${2.6+Math.random()*1.4}s;--spin:${Math.random()*900-450}deg;background:${colors[i%colors.length]};border-radius:${i%3===0?'50%':'2px'};width:${6+Math.random()*5}px;height:${8+Math.random()*8}px`;
-  layer.appendChild(petal);
- }
- document.body.appendChild(layer);
- setTimeout(()=>layer.remove(),5000);
-}
 document.addEventListener('checkinschange',event=>{
  if(event.detail?.checked&&journeyState().completed.length===20){
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)celebrateAllStops();
   clearTimeout(joyTimer);joyTimer=setTimeout(()=>{$('#checkinJoy').hidden=true},4800);
  }
 });
