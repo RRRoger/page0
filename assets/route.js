@@ -2,11 +2,13 @@ let visitRouteLine=null;
 function legAdvice(meters){return meters===0?'同楼盘步行 · 核对不同门位':meters<=600?'建议步行':'建议共享单车'}
 function renderVisitRoute(){
  const checked=ROUTE.order.filter(isChecked).length;
- $('#routeSummary').textContent=`已签到 ${checked}/20 · 从 20 号出发，19 号结束，不返回起点`;
+ const upcoming=ROUTE.order.find(n=>!isChecked(n));
+ $('#routeSummary').textContent=`已完成 ${checked} 站 · 剩余 ${20-checked} 站`;
+ $('#routeProgress').value=checked;
  $('#routeStops').innerHTML=ROUTE.order.map((n,i)=>{
   const d=DATA.find(d=>d.n===n),leg=ROUTE.legs[i-1];
   const segment=leg?(leg.meters===0?legAdvice(0):`上站 → 此站 · 直线 ${(leg.meters/1000).toFixed(2)} km · ${legAdvice(leg.meters)}`):'起点 · 请先到达这里';
-  return `<li><p class="route-leg">${segment}</p><div class="route-stop"><span class="route-sequence">${i+1}</span><div><strong>${n} 号 · ${escapeHTML(d['楼盘名称'])}</strong><p>${escapeHTML(d['地址'])}</p><small>${isChecked(n)?'已签到':'待前往'} · ${escapeHTML(d['门的方位'])}</small></div><button class="text-button" data-route-stop="${n}">查看</button></div></li>`;
+  return `<li class="${isChecked(n)?'stop-done':n===upcoming?'stop-next':'stop-pending'}" ${n===upcoming?'aria-current="step"':''}><p class="route-leg">${segment}</p><div class="route-stop"><span class="route-sequence">${isChecked(n)?'✓':i+1}</span><div>${n===upcoming?'<span class="next-badge">下一站</span>':''}<strong>${n} 号 · ${escapeHTML(d['楼盘名称'])}</strong><p>${escapeHTML(d['地址'])}</p><small>${isChecked(n)?'已打卡':'待前往'} · ${escapeHTML(d['门的方位'])}</small></div><button class="text-button" data-route-stop="${n}">查看</button></div></li>`;
  }).join('');
  const next=ROUTE.order.find(n=>!isChecked(n));$('#routeNext').disabled=next===undefined;$('#routeNext').textContent=next===undefined?'20 个点位已全部签到':`查看下一未签到点 · ${next} 号`;
 }
