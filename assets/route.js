@@ -16,17 +16,16 @@ function renderVisitRoute(){
 function openVisitRoute(){renderVisitRoute();$('#visitRoute').showModal()}
 function fitRouteOverview(){if(!map)return;map.fitBounds(L.latLngBounds(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord)),{padding:[60,60],maxZoom:14,animate:false})}
 function drawRouteOverlay(){
+ document.body.classList.add('route-overview');
  $('#routeStartBanner').hidden=false;
  map.createPane('routeArrows');map.getPane('routeArrows').style.zIndex=750;map.getPane('routeArrows').style.pointerEvents='none';
- if(visitRouteLine)map.removeLayer(visitRouteLine);
- if(visitRouteArrows)map.removeLayer(visitRouteArrows);
- const routeCoords=ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord);
- visitRouteLine=L.polyline(routeCoords,{color:'#387cf0',weight:4,dashArray:'8 9',opacity:.95,interactive:false}).addTo(map);
+ if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);
+ const coords=ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord);
+ visitRouteLine=L.polyline(coords,{color:'#387cf0',weight:6,opacity:.9,lineCap:'round',lineJoin:'round',interactive:false}).addTo(map);
  visitRouteArrows=L.layerGroup().addTo(map);
  ROUTE.order.forEach((n,i)=>{
-  const d=DATA.find(x=>x.n===n),next=ROUTE.order[i+1],angle=next?Math.atan2(DATA.find(x=>x.n===next).coord[1]-d.coord[1],DATA.find(x=>x.n===next).coord[0]-d.coord[0])*180/Math.PI:0;
-  const start=i===0;
-  L.marker(d.coord,{interactive:false,keyboard:false,pane:'routeArrows',icon:L.divIcon({className:'route-arrow-marker '+(start?'route-start':'') ,html:`<span class=\"route-arrow\" style=\"--angle:${angle}deg\"><b>${start?'起点 ':''}${i+1}</b><i>➜</i></span>`,iconSize:start?[92,48]:[58,38],iconAnchor:start?[46,24]:[29,19]})}).addTo(visitRouteArrows);
+  const d=DATA.find(x=>x.n===n),start=i===0;
+  L.marker(d.coord,{interactive:false,keyboard:false,pane:'routeArrows',icon:L.divIcon({className:'route-node-marker '+(start?'route-start-node':''),html:`<span class="route-node">${n}</span>`,iconSize:start?[48,30]:[30,30],iconAnchor:start?[24,15]:[15,15]})}).addTo(visitRouteArrows);
  });
  $('#routeMapNote').hidden=false;
 }
@@ -76,7 +75,7 @@ function setMapPreview(visible){
 }
 function openFullMap(locate=false){
  selected=null;expanded=false;listView();
- document.body.classList.add('location-mode');$('#returnJourney').hidden=false;
+ document.body.classList.add('location-mode');document.body.classList.toggle('route-overview',!locate);$('#returnJourney').hidden=false;
  setMapPreview(true);map.invalidateSize({pan:false});
  $('#locationStatus').hidden=!locate;
  if(locate)locateMe();else {drawRouteOverlay();fitRouteOverview();setTimeout(fitRouteOverview,600);}
@@ -85,7 +84,7 @@ $('#previewMap').onclick=()=>openFullMap();
 $('#locateFromHome').onclick=()=>openFullMap(true);
 function returnToJourney(){
  if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);visitRouteLine=null;visitRouteArrows=null;$('#routeMapNote').hidden=true;$('#routeStartBanner').hidden=true;
- document.body.classList.remove('location-mode');$('#returnJourney').hidden=true;
+ document.body.classList.remove('location-mode','route-overview');$('#returnJourney').hidden=true;
  selected=null;expanded=false;listView();setMapPreview(false);renderJourney();window.scrollTo(0,0);
 }
 $('#returnJourney').onclick=returnToJourney;
