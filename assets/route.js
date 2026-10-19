@@ -15,9 +15,16 @@ function renderVisitRoute(){
 }
 function openVisitRoute(){renderVisitRoute();$('#visitRoute').showModal()}
 function fitRouteOverview(){if(!map)return;map.fitBounds(L.latLngBounds(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord)),{padding:[60,60],maxZoom:14,animate:false})}
+function updateRouteStartBanner(){
+ const completed=ROUTE.order.filter(isChecked),current=completed.length?completed[completed.length-1]:null,next=ROUTE.order.find(n=>!isChecked(n));
+ $('#routeStartBanner').hidden=false;
+ $('#routeStartBanner small').textContent=current?'当前进度':'路线起点';
+ $('#routeStartBanner strong').innerHTML=current?(next?`${current} 号 <i>➜</i> ${next} 号`:`${current} 号 · 全部完成`):`20 号 <i>➜</i> 19 号`;
+ $('#routeStartBanner span').textContent=current?(next?'已到达当前点位，继续前往下一站':'20 个点位全部完成'):'从 20 号开始，按路线顺序前进';
+}
 function drawRouteOverlay(){
  document.body.classList.add('route-overview');
- $('#routeStartBanner').hidden=false;
+ updateRouteStartBanner();
  map.createPane('routeArrows');map.getPane('routeArrows').style.zIndex=750;map.getPane('routeArrows').style.pointerEvents='none';
  if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);
  const coords=ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord);
@@ -57,13 +64,14 @@ function renderJourney(){
  $('#journeyHint').textContent=destination?(last?'直线约 '+formatDistance(map.distance(last.coord,destination.coord))+' · '+legAdvice(Math.round(map.distance(last.coord,destination.coord))):'先前往起点 · 地图内选择交通方式'):'';
  $('#homeNavigate').hidden=!destination;$('#homeCheckin').hidden=!destination;$('#undoLast').hidden=!last;
  layout();
+ if(document.body.classList.contains('route-overview'))updateRouteStartBanner();
 }
 $('#homeNavigate').onclick=()=>{const {next}=journeyState();if(next!==undefined)openNavigation(DATA.find(d=>d.n===next))};
 $('#homeCheckin').onclick=()=>{const {next}=journeyState();if(next!==undefined){toggleCheckin(next);listView();renderJourney();focusJourney()}};
 $('#undoLast').onclick=()=>{const {latest}=journeyState();if(latest!==undefined){toggleCheckin(latest);listView();renderJourney();focusJourney()}};
 function focusJourney(){const {latest,next}=journeyState();if(next===undefined){fit();return}const points=[DATA.find(d=>d.n===next).coord];if(latest!==undefined)points.push(DATA.find(d=>d.n===latest).coord);map.fitBounds(points,{padding:[55,55],maxZoom:16,animate:false})}
 $('#pointSearch').ontoggle=()=>{layout();if(selected===null)fit()};
-document.addEventListener('checkinschange',renderJourney);
+document.addEventListener('checkinschange',()=>{renderJourney();if(document.body.classList.contains('route-overview'))drawRouteOverlay()});
 window.addEventListener('pageshow',()=>{try{const saved=JSON.parse(localStorage.getItem(CHECKIN_KEY)||'{}');if(saved&&typeof saved==='object'&&!Array.isArray(saved))checkins=saved}catch{}render();renderJourney()});
 renderJourney();focusJourney();
 
