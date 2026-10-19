@@ -1,4 +1,4 @@
-let visitRouteLine=null;
+let visitRouteLine=null,visitRouteArrows=null;
 function formatDistance(meters){return meters<1000?`${Math.round(meters)} 米`:`${(meters/1000).toFixed(1)} 千米`}
 function legAdvice(meters){return meters===0?'同楼盘步行 · 核对不同门位':meters<=600?'建议步行':'建议共享单车'}
 function renderVisitRoute(){
@@ -14,16 +14,29 @@ function renderVisitRoute(){
  const next=ROUTE.order.find(n=>!isChecked(n));$('#routeNext').disabled=next===undefined;$('#routeNext').textContent=next===undefined?'20 个点位已全部签到':`查看下一未签到点 · ${next} 号`;
 }
 function openVisitRoute(){renderVisitRoute();$('#visitRoute').showModal()}
-function showVisitRouteMap(){
- $('#visitRoute').close();openFullMap();selected=null;expanded=false;region='全部';$('#search').value='';listView();
+function fitRouteOverview(){if(!map)return;map.fitBounds(L.latLngBounds(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord)),{padding:[60,60],maxZoom:14,animate:false})}
+function drawRouteOverlay(){
+ $('#routeStartBanner').hidden=false;
+ map.createPane('routeArrows');map.getPane('routeArrows').style.zIndex=750;map.getPane('routeArrows').style.pointerEvents='none';
  if(visitRouteLine)map.removeLayer(visitRouteLine);
- visitRouteLine=L.polyline(ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord),{color:'#ac5225',weight:3,dashArray:'7 8',opacity:.9,interactive:false}).addTo(map);
- $('#routeMapNote').hidden=false;fit();
+ if(visitRouteArrows)map.removeLayer(visitRouteArrows);
+ const routeCoords=ROUTE.order.map(n=>DATA.find(d=>d.n===n).coord);
+ visitRouteLine=L.polyline(routeCoords,{color:'#387cf0',weight:4,dashArray:'8 9',opacity:.95,interactive:false}).addTo(map);
+ visitRouteArrows=L.layerGroup().addTo(map);
+ ROUTE.order.forEach((n,i)=>{
+  const d=DATA.find(x=>x.n===n),next=ROUTE.order[i+1],angle=next?Math.atan2(DATA.find(x=>x.n===next).coord[1]-d.coord[1],DATA.find(x=>x.n===next).coord[0]-d.coord[0])*180/Math.PI:0;
+  const start=i===0;
+  L.marker(d.coord,{interactive:false,keyboard:false,pane:'routeArrows',icon:L.divIcon({className:'route-arrow-marker '+(start?'route-start':'') ,html:`<span class=\"route-arrow\" style=\"--angle:${angle}deg\"><b>${start?'起点 ':''}${i+1}</b><i>➜</i></span>`,iconSize:start?[92,48]:[58,38],iconAnchor:start?[46,24]:[29,19]})}).addTo(visitRouteArrows);
+ });
+ $('#routeMapNote').hidden=false;
+}
+function showVisitRouteMap(){
+ $('#visitRoute').close();openFullMap();
 }
 $('#routePlan').onclick=openVisitRoute;$('#closeVisitRoute').onclick=()=>$('#visitRoute').close();
 $('#routeStops').onclick=e=>{const button=e.target.closest('[data-route-stop]');if(button){$('#visitRoute').close();showDetail(Number(button.dataset.routeStop))}};
 $('#routeNext').onclick=()=>{const n=ROUTE.order.find(n=>!isChecked(n));if(n!==undefined){$('#visitRoute').close();showDetail(n)}};
-$('#routeOnMap').onclick=showVisitRouteMap;$('#routeMapNote').onclick=()=>{if(visitRouteLine)map.removeLayer(visitRouteLine);visitRouteLine=null;$('#routeMapNote').hidden=true};
+$('#routeOnMap').onclick=showVisitRouteMap;$('#routeMapNote').onclick=()=>{if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);visitRouteLine=null;visitRouteArrows=null;$('#routeMapNote').hidden=true};
 
 
 function journeyState(){
@@ -59,18 +72,19 @@ function setMapPreview(visible){
  document.body.classList.toggle('map-preview-visible',visible);
  $('#previewMap').textContent=visible?'收起地图':'地图预览';
  if(visible&&onlineTiles&&!map.hasLayer(onlineTiles))onlineTiles.addTo(map);
- layout();if(visible)focusJourney();
+ layout();if(visible&&!document.body.classList.contains('location-mode'))focusJourney();
 }
 function openFullMap(locate=false){
  selected=null;expanded=false;listView();
  document.body.classList.add('location-mode');$('#returnJourney').hidden=false;
  setMapPreview(true);map.invalidateSize({pan:false});
  $('#locationStatus').hidden=!locate;
- if(locate)locateMe();else fit();
+ if(locate)locateMe();else {drawRouteOverlay();fitRouteOverview();setTimeout(fitRouteOverview,600);}
 }
 $('#previewMap').onclick=()=>openFullMap();
 $('#locateFromHome').onclick=()=>openFullMap(true);
 function returnToJourney(){
+ if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);visitRouteLine=null;visitRouteArrows=null;$('#routeMapNote').hidden=true;$('#routeStartBanner').hidden=true;
  document.body.classList.remove('location-mode');$('#returnJourney').hidden=true;
  selected=null;expanded=false;listView();setMapPreview(false);renderJourney();window.scrollTo(0,0);
 }
@@ -103,3 +117,5 @@ document.addEventListener('checkinschange',event=>{
   clearTimeout(joyTimer);joyTimer=setTimeout(()=>{$('#checkinJoy').hidden=true},4800);
  }
 });
+
+if(new URLSearchParams(location.search).get('preview')==='1'){setTimeout(()=>openFullMap(),80)}
