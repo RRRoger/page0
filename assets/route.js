@@ -80,7 +80,7 @@ function openFullMap(locate=false){
  $('#locationStatus').hidden=!locate;
  if(locate)locateMe();else {drawRouteOverlay();fitRouteOverview();setTimeout(fitRouteOverview,600);}
 }
-$('#previewMap').onclick=()=>openFullMap();
+$('#previewMap').onclick=()=>{location.hash='map';openFullMap()};
 $('#locateFromHome').onclick=()=>openFullMap(true);
 function returnToJourney(){
  if(visitRouteLine)map.removeLayer(visitRouteLine);if(visitRouteArrows)map.removeLayer(visitRouteArrows);visitRouteLine=null;visitRouteArrows=null;$('#routeMapNote').hidden=true;$('#routeStartBanner').hidden=true;
