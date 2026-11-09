@@ -22,3 +22,4 @@ body.simple-home{background:#f6f3e9;color:#253c32}
 .festive-heading .ornament{fill:#ad3739;stroke:none}
 .finish-celebration{background:#173f33}.finish-orbit svg{stroke:#e7c88a}.finish-cheer{color:#f1dfba}.finish-thanks{color:#d7e5d8}#closeFinish{background:#f1dfba;color:#284539}
 ::selection{background:#ead7ad;color:#173f33}
+.holiday-snow{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:850}.holiday-snow i{position:absolute;top:-12px;left:var(--x);width:var(--size);height:var(--size);border-radius:50%;background:#fff;box-shadow:0 1px 2px #486c5530;opacity:0;animation:holiday-fall var(--t) var(--delay) linear infinite;pointer-events:none}@keyframes holiday-fall{0%{transform:translate3d(0,-12px,0);opacity:0}10%{opacity:.65}85%{opacity:.45}100%{transform:translate3d(32px,102vh,0);opacity:0}}.location-mode .holiday-snow{opacity:.35}@media(prefers-reduced-motion:reduce){.holiday-snow{display:none}}

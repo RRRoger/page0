@@ -68,7 +68,7 @@ function renderJourney(){
  document.body.classList.toggle('journey-complete',completed.length===20);
  $('#stampCircles').innerHTML=ROUTE.order.map(n=>`<span role="listitem" class="stamp-circle ${isChecked(n)?'stamped':n===next?'stamp-next':''}" aria-label="${n}号，${isChecked(n)?'已打卡':n===next?'下一站':'未打卡'}" title="${n}号 · ${escapeHTML(DATA.find(d=>d.n===n)['楼盘名称'])}">${isChecked(n)?'✓':n}</span>`).join('');
  $('#journeyProgress').textContent=`${completed.length} / 20 已打卡`;
- $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:'尚未开始 · 先前往第 20 号点位';
+ $('#journeyCurrent').textContent=last?`最近打卡：${latest} 号 · ${last['楼盘名称']}`:`尚未开始 · 先前往第 ${ROUTE.start} 号点位`;
  $('#journeyNextLabel').textContent=destination?(completed.length?'下一站':'第一站'):'全部完成';
  $('#journeyNextName').textContent=destination?`${next} 号 · ${destination['楼盘名称']}`:'20 站，全线拿下。今天的你，真牛。';
  $('#nextAddress').textContent=destination?`${destination['地址']} · ${destination['门的方位']}`:'这一程，辛苦了。打卡记录已保存。';
@@ -128,7 +128,7 @@ $('#confirmRestart').onclick=()=>{
  try{localStorage.removeItem(CHECKIN_KEY)}catch{toast('未能清空记录，请检查浏览器存储权限后重试');return}
  checkins={};clearTimeout(joyTimer);$('#checkinJoy').hidden=true;
  if(visitRouteLine){map.removeLayer(visitRouteLine);visitRouteLine=null}$('#routeMapNote').hidden=true;
- region='全部';$('#search').value='';$('#restartDialog').close();returnToJourney();renderVisitRoute();focusJourney();toast('已重新开始，从 20 号出发');
+ region='全部';$('#search').value='';$('#restartDialog').close();returnToJourney();renderVisitRoute();focusJourney();toast(`已重新开始，从 ${ROUTE.start} 号出发`);
 };
 document.addEventListener('checkinschange',event=>{
  if(event.detail?.checked&&journeyState().completed.length===20){
