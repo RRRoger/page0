@@ -1,0 +1,24 @@
+/* Seasonal skin: preserve task hierarchy and touch targets. */
+:root{--green:#215444;--muted:#59665e;--line:#deded2}
+body.simple-home{background:#f6f3e9;color:#253c32}
+.simple-home header{background:#f6f3e9}
+.simple-home .brand-name{color:#215444}
+.simple-home .journey-card{background:#173f33;color:#fff8e8;box-shadow:0 12px 30px #173f331a}
+.simple-home .journey-title,.simple-home .journey-next strong{color:#fff8e8}
+.simple-home .journey-card p,.simple-home #nextAddress,.simple-home #journeyProgress{color:#d7e5d8}
+.simple-home .journey-card .journey-next{background:#214f40}
+.simple-home .route-map-primary{background:#f1dfba;color:#284539;box-shadow:none}
+.simple-home #homeCheckin{background:#b63c3c;color:#fff}
+.simple-home #homeNavigate{background:#e9eee3;color:#214c3b}
+.simple-home .home-links button{color:#e5eada}
+.simple-home .stamp-circle{background:#285646;color:#e4eadb;border-color:#4d7764}
+.simple-home .stamp-circle.stamped{background:#f1dfba;color:#244737;border-color:#f1dfba}
+.simple-home .stamp-circle.stamp-next{border-color:#e7c88a;color:#fff;background:#923b36}
+.route-overview #mapJourney{background:#fffdf6;color:#234335}
+#mapCheckin{background:#a93435}#mapNavigate{background:#e8efe5;color:#214c3b}
+.map-journey-top button,#mapUndo{color:#215444}
+.festive-heading{display:flex;align-items:center;gap:8px;margin:8px 0 14px;color:#526b59;font-size:12px}
+.festive-heading svg{width:27px;height:32px;flex:none;stroke:#215444;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.festive-heading .ornament{fill:#ad3739;stroke:none}
+.finish-celebration{background:#173f33}.finish-orbit svg{stroke:#e7c88a}.finish-cheer{color:#f1dfba}.finish-thanks{color:#d7e5d8}#closeFinish{background:#f1dfba;color:#284539}
+::selection{background:#ead7ad;color:#173f33}

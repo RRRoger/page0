@@ -136,7 +136,7 @@ document.addEventListener('checkinschange',event=>{
  }
 });
 
-if(new URLSearchParams(location.search).get('preview')==='1'){setTimeout(()=>openFullMap(),80)}
+if(new URLSearchParams(location.search).get('preview')==='1'||location.hash==='#map'){setTimeout(()=>openFullMap(),80)}
 
 $('#mapNavigate').onclick=()=>{const {next}=journeyState();if(next!==undefined)openNavigation(DATA.find(d=>d.n===next))};
 $('#mapCheckin').onclick=()=>{const {next}=journeyState();if(next!==undefined){toggleCheckin(next);focusMapLeg()}};
